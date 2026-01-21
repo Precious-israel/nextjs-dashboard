@@ -1,16 +1,12 @@
 import { generateYAxis } from '@/app/lib/utils';
 import { CalendarIcon } from '@heroicons/react/24/outline';
 import { lusitana } from '@/app/ui/fonts';
-import { Revenue } from '@/app/lib/definitions';
+import { fetchRevenue } from '@/app/lib/data';
 
-export default async function RevenueChart({
-  revenue,
-}: {
-  revenue: Revenue[];
-}) {
+export default async function RevenueChart() { // Make component async, remove the props
+  const revenue = await fetchRevenue(); // Fetch data inside the component
+  
   const chartHeight = 350;
-
-  // Generate Y-axis labels and top label for scaling
   const { yAxisLabels, topLabel } = generateYAxis(revenue);
 
   if (!revenue || revenue.length === 0) {
@@ -19,15 +15,15 @@ export default async function RevenueChart({
 
   return (
     <div className="w-full md:col-span-4">
-      <h2 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
+      <h2 className={`${lusitana.className} mb-4 text-xl`}>
         Recent Revenue
       </h2>
 
       <div className="rounded-xl bg-gray-50 p-4">
-        <div className="sm:grid-cols-13 mt-0 grid grid-cols-12 items-end gap-2 rounded-md bg-white p-4 md:gap-4">
+        <div className="grid grid-cols-13 gap-2 items-end">
           {/* Y-axis labels */}
           <div
-            className="mb-6 hidden flex-col justify-between text-sm text-gray-400 sm:flex"
+            className="mb-6 flex flex-col justify-between text-sm text-gray-400"
             style={{ height: `${chartHeight}px` }}
           >
             {yAxisLabels.map((label) => (
@@ -35,7 +31,7 @@ export default async function RevenueChart({
             ))}
           </div>
 
-          {/* Revenue bars */}
+          {/* Bars */}
           {revenue.map((month) => (
             <div key={month.month} className="flex flex-col items-center gap-2">
               <div
@@ -43,18 +39,17 @@ export default async function RevenueChart({
                 style={{
                   height: `${(chartHeight / topLabel) * month.revenue}px`,
                 }}
-              ></div>
-              <p className="-rotate-90 text-sm text-gray-400 sm:rotate-0">
-                {month.month}
-              </p>
+              />
+              <p className="text-sm text-gray-400">{month.month}</p>
             </div>
           ))}
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center pb-2 pt-6">
+        <div className="flex items-center pt-6">
           <CalendarIcon className="h-5 w-5 text-gray-500" />
-          <h3 className="ml-2 text-sm text-gray-500">Last 12 months</h3>
+          <h3 className="ml-2 text-sm text-gray-500">
+            Last 12 months
+          </h3>
         </div>
       </div>
     </div>
