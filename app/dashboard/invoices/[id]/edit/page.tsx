@@ -2,8 +2,12 @@ import Form from '@/app/ui/invoices/edit-form';
 import Breadcrumbs from '@/app/ui/invoices/breadcrumbs';
 import { fetchInvoiceById, fetchCustomers } from '@/app/lib/data';
 
-export default async function Page(props: { params: { id: string } }) {
-  const { id } = props.params;
+export default async function Page({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const { id } = params;
 
   // Fetch invoice and customers in parallel
   const [invoice, customers] = await Promise.all([
