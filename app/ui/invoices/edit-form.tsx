@@ -22,7 +22,7 @@ export default function EditInvoiceForm({
   // --------------------------
   // Hooks must always be called
   // --------------------------
-  const initialState: State = { message: null, errors: {} };
+  const initialState: State = { message: null, errors: { customerId: [], amount: [], status: [] } };
   const updateInvoiceAction = async (state: State, formData: FormData) =>
     updateInvoice(invoice!.id, state, formData); // wrap to match useActionState signature
   const [state, formAction] = useActionState(updateInvoiceAction, initialState);
@@ -58,7 +58,7 @@ export default function EditInvoiceForm({
             </select>
             <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
           </div>
-          <div id="customer-error" aria-live="polite">
+          <div id="customer-error" aria-live="polite" aria-atomic="true">
             {state.errors?.customerId?.map((err) => (
               <p key={err} className="mt-2 text-sm text-red-500">{err}</p>
             ))}
@@ -131,7 +131,11 @@ export default function EditInvoiceForm({
         </fieldset>
 
         {/* Form-level message */}
-        {state.message && <p className="mt-2 text-sm text-red-600">{state.message}</p>}
+        {state.message && (
+          <div className="mt-4 rounded-md bg-red-50 p-3 border border-red-200">
+            <p className="text-sm text-red-600">{state.message}</p>
+          </div>
+        )}
       </div>
 
       <div className="mt-6 flex justify-end gap-4">

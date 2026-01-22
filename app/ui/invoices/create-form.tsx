@@ -10,32 +10,11 @@ import {
   UserCircleIcon,
 } from '@heroicons/react/24/outline';
 import { Button } from '@/app/ui/button';
-import { createInvoice } from '@/app/lib/actions';
-
-type State = {
-  message: string | null;
-  errors: {
-    customerId?: string[];
-    amount?: string[];
-    status?: string[];
-  };
-};
+import { createInvoice, State } from '@/app/lib/actions';
 
 export default function Form({ customers }: { customers: CustomerField[] }) {
-  const initialState: State = { message: null, errors: {} };
-
-  const [state, formAction] = useActionState(
-    async (state: State, formData: FormData) => {
-      try {
-        // Pass state as first argument
-        const result = await createInvoice(state, formData);
-        return { ...state, message: result.message, errors: result.errors || {} };
-      } catch (err: any) {
-        return { ...state, message: err.message || 'An error occurred' };
-      }
-    },
-    initialState
-  );
+  const initialState: State = { message: null, errors: { customerId: [], amount: [], status: [] } };
+  const [state, formAction] = useActionState(createInvoice, initialState);
 
   return (
     <form action={formAction}>
@@ -152,10 +131,11 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
             ))}
           </div>
         </fieldset>
-
         {/* Optional success/error message */}
         {state.message && (
-          <p className="mt-2 text-sm text-red-600">{state.message}</p>
+          <div className="mt-4 rounded-md bg-red-50 p-3 border border-red-200">
+            <p className="text-sm text-red-600">{state.message}</p>
+          </div>
         )}
       </div>
 

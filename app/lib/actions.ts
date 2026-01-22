@@ -14,7 +14,7 @@ const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 // Types
 // ---------------------
 export type State = {
-  errors?: {
+  errors: {
     customerId?: string[];
     amount?: string[];
     status?: string[];
@@ -35,26 +35,6 @@ const FormSchema = z.object({
 
 const CreateInvoice = FormSchema.omit({ id: true, date: true });
 const UpdateInvoice = FormSchema.omit({ id: true, date: true });
-
-// ---------------------
-// Helper: Map Zod Errors (optional fallback)
-// ---------------------
-function mapZodErrors(error: z.ZodError): State {
-  const fieldErrors: NonNullable<State['errors']> = {
-    customerId: [],
-    amount: [],
-    status: [],
-  };
-
-  error.errors.forEach((e) => {
-    const path = e.path[0] as string;
-    if (path === 'customerId' || path === 'amount' || path === 'status') {
-      fieldErrors[path as keyof typeof fieldErrors]?.push(e.message);
-    }
-  });
-
-  return { errors: fieldErrors, message: null };
-}
 
 // ---------------------
 // Create Invoice
@@ -88,13 +68,11 @@ export async function createInvoice(
     `;
   } catch (error) {
     console.error(error);
-    return { message: 'Database Error: Failed to Create Invoice.' };
+    return { message: 'Database Error: Failed to Create Invoice.', errors: {} };
   }
 
   revalidatePath('/dashboard/invoices');
   redirect('/dashboard/invoices');
-
-  return { message: null };
 }
 
 // ---------------------
@@ -129,13 +107,11 @@ export async function updateInvoice(
     `;
   } catch (error) {
     console.error(error);
-    return { message: 'Database Error: Failed to Update Invoice.' };
+    return { message: 'Database Error: Failed to Update Invoice.', errors: {} };
   }
 
   revalidatePath('/dashboard/invoices');
   redirect('/dashboard/invoices');
-
-  return { message: null };
 }
 
 // ---------------------
